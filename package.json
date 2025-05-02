@@ -1,16 +1,18 @@
 {
-  "name": "nicferrier-npm-dom-cache",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "ignore": "^7.0.4",
-    "linkedom": "^0.18.10"
-  }
+    "name": "@nicferrier/dom-cache",
+    "version": "1.0.0",
+    "description": "A mini framework for using dom on the server side.",
+    "main": "dom-cache.mjs",
+    "scripts": {
+        "test": "node test.mjs"
+    },
+    "keywords": ["dom", "framework"],
+    "author": "Nic Ferrier <ferriernic@gmail.com>",
+    "repository": "nicferrier/npm-dom-cache",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "ignore": "^7.0.4",
+        "linkedom": "^0.18.10"
+    }
 }

@@ -95,10 +95,10 @@ export default function (directory, {
         async getJsdom(pageName) {
             const dom = jsdomCache[pageName];
             if (dom) {
-                return dom;
+                return dom.cloneNode(true);
             }
             // Else there's no file
-            return apiObject.updateJsdom(pageName);
+            return apiObject.updateJsdom(pageName).then(d => d.cloneNode(true));
         },
 
         // Stops the embedded watcher
