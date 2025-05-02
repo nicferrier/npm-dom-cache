@@ -1,0 +1,16 @@
+{
+  "name": "nicferrier-npm-dom-cache",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "ignore": "^7.0.4",
+    "linkedom": "^0.18.10"
+  }
+}
