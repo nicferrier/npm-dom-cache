@@ -7,11 +7,34 @@ import ignore from "ignore";
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
+// Could use this...
 const defaultIgnoreFile = path.join(__dirname, ".gitignore");
 
+// But this is better: compute the dirname of the thing that called us
+// by ignoring the recent stack names that are this file, presume
+// there is a .gitignore in that directory.
+const stackFrameFileRegex = new RegExp(/.*\(file:[/]+([^:]+):.*\)/);
+const defaultIgnoreFunction = function () {
+    const s = new Error().stack;
+    for (const frame of s.split(" at ")) {
+        const matched = stackFrameFileRegex.exec(frame);
+        if (matched === null) continue;
+
+        const [_, fileRef] = matched;
+        if (fileRef) {
+            if ("/" + fileRef === __filename) continue;
+            return path.join(path.dirname("/" + fileRef), ".gitignore");
+        }
+    }
+    return process.cwd();
+};
+
+// ignoreFile can be a function or a string - if a function it is
+// evaluated with no args
 export default function (directory, {
     modifierFunctions=[],
-    ignoreFile=defaultIgnoreFile,
+    ignoreFile=defaultIgnoreFunction,
     errReporting = {
         ignoreErrors:false
     }
@@ -20,6 +43,10 @@ export default function (directory, {
     const jsdomCache = {};
     const [ignoreErr, ignoreText] = (function () {
         try {
+            const realIgnoreFile = typeof(ignoreFile) === "function"
+                  ? (ignoreFile())
+                  : ignoreFile;
+            // console.log("real ignore file:", realIgnoreFile);
             return [,fs.readFileSync(ignoreFile, "utf8")];
         }
         catch (e) { return [e]; }
