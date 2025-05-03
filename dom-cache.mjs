@@ -14,7 +14,7 @@ const defaultIgnoreFile = path.join(__dirname, ".gitignore");
 // But this is better: compute the dirname of the thing that called us
 // by ignoring the recent stack names that are this file, presume
 // there is a .gitignore in that directory.
-const stackFrameFileRegex = new RegExp(/.*\(file:[/]+([^:]+):.*\)/);
+const stackFrameFileRegex = new RegExp(/.*\(*file:[/]+([^:]+):.*\)*/);
 const defaultIgnoreFunction = function () {
     const s = new Error().stack;
     for (const frame of s.split(" at ")) {
@@ -40,21 +40,22 @@ export default function (directory, {
     }
 }={}) {
     // console.log(`ignore errors:`, errReporting?.ignoreErrors, errReporting);
+    var realIgnoreFile;
     const jsdomCache = {};
     const [ignoreErr, ignoreText] = (function () {
         try {
-            const realIgnoreFile = typeof(ignoreFile) === "function"
+            realIgnoreFile = typeof(ignoreFile) === "function"
                   ? (ignoreFile())
                   : ignoreFile;
             // console.log("real ignore file:", realIgnoreFile);
-            return [,fs.readFileSync(ignoreFile, "utf8")];
+            return [,fs.readFileSync(realIgnoreFile, "utf8")];
         }
         catch (e) { return [e]; }
     })();
 
     if (ignoreErr) {
         if (errReporting?.ignoreErrors === false) {
-            console.warn(`dom-cache unable to read ignore file '${ignoreFile}':`, ignoreErr);
+            console.warn(`dom-cache unable to read ignore file '${realIgnoreFile}':`, ignoreErr);
         }
     }
 

@@ -71,6 +71,39 @@ for (const row of databaseResult.rows) {
 This is quite fast.
 
 
+## API
+
+Everything is in the dom cache creation really:
+
+```
+function domCache (directory, {
+    modifierFunctions=[],
+    ignoreFile=defaultIgnoreFunction,
+    errReporting = {
+        ignoreErrors:false
+    }
+```
+
+The `modifierFunctions` are called on load of a page into the cache,
+before the entry into the cache is made. Which means it's possible to
+alter the DOMs before they are cached, for example to make them
+consistent: add a `HEAD` or a `FOOTER` or whatever.
+
+The tests have an example.
+
+
+The `ignoreFile` can be a path to an ignore file, such as gitignore or
+a function to be called with no arguments which is expected to return
+an ignore file path.
+
+The `defaultIgnoreFunction` tries to compute a `.gitignore` from the
+stack trace of the caller, presuming that the caller will be running
+somewhere located near a `.gitignore`. This is just how I do things
+normally, I don't use `src` directories or the like...
+
+`errReporting` just turns on or off some messaging about errors.
+
+
 ## Further improvements
 
 I would like to make the speed even faster and the memory footprint
