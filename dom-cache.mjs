@@ -46,11 +46,11 @@ export default function (directory, {
             return;
         }
         if (et === "change" && filename.endsWith(".html")) {
-            updateJsdom(path.basename(filename, ".html"));
+            apiObject.updateJsdom(path.basename(filename, ".html"));
         } 
     });
 
-    const apiObject = {
+    var apiObject = {
         async updateJsdom(pageName) {
             console.log("updating file template:", pageName);
             const fileText = await fs.promises.readFile(
