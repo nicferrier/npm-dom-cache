@@ -64,7 +64,7 @@ and then do something like:
 const page = pages.getJsdom("db-result");
 for (const row of databaseResult.rows) {
    const script = page.body.appendChild(page.createElement("script"));
-   script.textContent = `templateMaterialize(${JSON.stringify(row)});
+   script.textContent = `templateMaterialize(${JSON.stringify(row)})`;
 }
 ```
 
