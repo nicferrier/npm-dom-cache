@@ -104,6 +104,58 @@ normally, I don't use `src` directories or the like...
 `errReporting` just turns on or off some messaging about errors.
 
 
+## Built-in _extensions_
+
+Dom-cache provides an ideal opportunity to load script into pages when
+we cache them, that's why the `modifierScripts` option is
+provided. This is an ideal way to extend the DOM.
+
+There are a few optional extensions built-in to dom-cache which you
+can activate when you create the cache:
+
+```js
+const cache = domCache(process.cwd(), {
+    formHandling: true,
+    templateJSData: true,
+    QquerySelector: true
+});
+```
+
+These are all documented separately
+[here](READMY-EXTENDING-WEBDEV-WITH-DOMCACHE.md).
+
+
+## Demonstration dom-cache server
+
+Serving dom-cache enabled HTML pages is something I sometimes find
+useful to do off the cuff so I also included a dom-cache enabled
+server which you can start in any directory and will dom-cache HTML
+files from the current directory.
+
+In addition it will serve a dom-cache index page if it can find one or
+generate a plain HTML index page of any HTML files it can find in the
+current directory.
+
+You can run the dom-cache server like this:
+
+```
+nicferrier-dcserver 9000
+```
+
+to start it on port 9000, although port 9000 is the default.
+
+You can also do:
+
+```
+nicferrier-dcserver help
+```
+
+to get basic help.
+
+It is _just_ an HTTP server, there are no certificates, so it's not
+useful for anything but local use.
+
+
 ## Further improvements
 
 I would like to make the speed even faster and the memory footprint

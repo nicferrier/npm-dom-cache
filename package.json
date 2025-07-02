@@ -1,17 +1,26 @@
 {
     "name": "@nicferrier/dom-cache",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "description": "A mini framework for using dom on the server side.",
     "main": "dom-cache.mjs",
+    "bin": {
+        "nicferrier-dcserver": "./dcserver.mjs"
+    },
     "scripts": {
         "test": "node test.mjs"
     },
-    "keywords": ["dom", "framework"],
+    "keywords": [
+        "dom",
+        "framework"
+    ],
     "author": "Nic Ferrier <ferriernic@gmail.com>",
     "repository": "nicferrier/npm-dom-cache",
     "license": "ISC",
     "dependencies": {
         "ignore": "^7.0.4",
         "linkedom": "^0.18.10"
+    },
+    "devDependencies": {
+        "express": "^5.1.0"
     }
 }

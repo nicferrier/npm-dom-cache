@@ -1,0 +1,250 @@
+# Extending WebDev with DomCache
+
+DomCache affords the perfect opportunity for backend developers to
+inject javascript into a page, through `modifierFunctions`:
+
+```js
+function myPageModifier(dom, api) {
+  if (process.env.PRODENV === "dev") {
+    dom.head.appendChild(dom.createElement("style"))
+       .textContent = "body { background-color: red !important; }";
+  }
+}
+const cache = domCache(__dirname, { modifierFunctions: [myPageModifier] });
+```
+
+This will insert a style to make it clear in the front end that the
+backend is running in the development environment.
+
+But this can also be used to extend HTML, consistently across an
+application, perhaps to provide some standard tooling for developers.
+
+DomCache even comes with some pre-canned extensions and this readme
+seeks to document those extensions.
+
+
+## Template helpers
+
+Doing:
+
+```js
+domCache(directory, {dataTemplating: true});
+```
+
+will turn on some data handling via `template` elements for all pages
+cached.
+
+This provides extended element methods for elements that have
+`template` children allowing `add` and `insert` to be used to append
+and insert plain Javascript data objects as child elements based on
+invoking the `template`.
+
+For example:
+
+```html
+<div id="example">
+  <template>
+    <P>You will witness the <slot name="keyVal"></slot>
+       of this <slot name="key"></slot>
+       </P>
+  </template>
+  <p>You will witness the awesome power of this extension library</P>
+</div>
+<script>document.querySelector("#example").add({
+    key: "battlestation",
+    keyVal: "awesome power"
+})</script>
+```
+
+will result in the following HTML:
+
+```html
+<div id="example">
+  <P>You will witness the awesome power of this extension library</P>
+  <P>You will witness the awesome power of this battlestation</P>
+</div>
+```
+
+In addition, if the object passed to `add` is a `Response` object then
+`add` will try to fetch `json` from the `Response` and use that as the
+data.
+
+This means that the Template Data extension can be used more directly
+with the Form Handling extension:
+
+```html
+<form method="POST" action="identity"
+      onsubmitx="this.fetch({onJSON: document.querySelector('#rowslist').add})">
+  <fieldset>
+    <label>field 1</label>
+    <input type="text" name="field1">
+    <label>field 2</label>
+    <input type="text" name="field2">
+  </fieldset>
+  <input type="submit" value="submmit">
+</form>
+<section id="rowslist">
+  <template>
+    <div>
+      <span><slot name="field1"></slot></span>
+      <span><slot name="field2"></slot></span>
+    </div>
+  </template>
+</section>
+```
+
+## Form Handling
+
+Doing:
+
+```js
+domCache(directory, {formHandling: true});
+```
+
+will turn on the Form Handling extension for all pages cached.
+
+This provides extended Form behaviour when an `onsubmitx` attribute is
+added to a `form` object. The extensions allow intercepting submission
+of the Form in the manner of the `submit` form event.
+
+Here is an example:
+
+```html
+<form method='POST' action='/create'
+      onsubmitx='alert('form action is ' + this.action)'>
+   <input type="submit" name="submit" value="submit me">
+</form>
+```
+
+Pressing `submit me` here will cause an alert with `form action is
+/create` as the warning message. The Form will _not_ be `POSTed` over
+the network because the `onsubmitx` script does not cause a `POST`.
+
+The value of `this` during the expression is always the current Form.
+
+The capability to do this would be limited if not for second part of
+the extension: the `fetch` function which is attached to each Form
+with the `onsubmitx` attribute.
+
+`Form.fetch` allows a form to be sent without browser context
+change. The form data is encoded in whatever way is specified by the
+`enctype` attribute of the form (or by the default) and then sent to
+the target, asynchronously, and a response is returned.
+
+Here is an example:
+
+```html
+<form method='POST' action='/create'
+      onsubmitx='this.fetch().then(response=>alert("form said:" + response.statusText))'>
+   <input type="submit" name="submit" value="submit me">
+</form>
+```
+
+Form.Fetch also extends the HTML specification for `enctype` allowing
+an `enctype` to be specified as `application/json` or `text/json`;
+when specified as either of those the Form's fields are turned into a
+JS object like this:
+
+```
+Object.fromEntries(new URLSearchParams(new FormData(form)))
+```
+
+It's possible to fail to convert things that way and currently there
+is no way to alter or influence this behaviour.
+
+
+Form.Fetch still has difficulties for practical Form handling, so
+`Form.fetch` can also take several document type handlers which will
+be executed depending on the response's `content-type`.
+
+
+For example, if the response content is an HTML or XML document,
+consider the following document excerpt:
+
+```html
+<div>
+  <form method="POST" action="/identity?out=html"
+        onsubmitx="this.fetch({onDocument(r) { this.parentElement.querySelector('article').innerHTML = r.document.body.innerHTML}})">
+    <input type="submit" name="send" value="show document handling">
+    <fieldset>
+      <label>field 1</label>
+      <input type="text" name="field1">
+      <label>field 2</label>
+      <input type="text" name="field2">
+      <label>field 3</label>
+      <input type="text" name="field3">
+    </fieldset>
+  </form>
+  <article>
+  </article>
+</div>
+```
+
+This will insert the body of the returned document into the `article`
+following the Form.
+
+It's also possible to do this with JSON:
+
+```html
+<form method='POST' action='/create'
+      onsubmitx='this.fetch({onJSON(r) alert(`the data was: ${JSON.stringify(r.data)}`)})'>
+   <input type="submit" name="submit" value="submit me">
+</form>
+```
+
+These examples of `Form.fetch` only work if the endpoint returns the
+correct content type, specifying a content type handler for that does
+not match the returned content will mean the content type handler is
+ignored.
+
+An error can be caught directly by the developer, in the `onsubmitx`
+like so:
+
+```html
+<form method="POST" onsubmitx='this.fetch().catch(e => alert("error! " + e.message))'>
+  <input type="submit" value="defaults send!">
+</form>
+```
+
+But there is also good _default_ behaviour. If the Form has a `name`
+and a `dialog` can be found in the document with the same `name` _and_
+the `class` which is the name of the JS Error, then the dialog will be
+opened, modal.
+
+For example, consider this document excerpt:
+
+```html
+<dialog name="registration" class="HTTPError">
+  <form method="dialog">
+    <button autofocus>Ok</button>
+  </form>
+  <P>Sorry, there was an error submitting the registration, call support?</P>
+</dialog>
+<form name="registration" method="POST" action="/register"
+      onsubmitx="this.fetch()">
+   <label>forename:</label><input type="text" name="forename">
+   <label>surname:</label> <input type="text" name="surname">
+   <input type="submit" value="register">
+</form>
+```
+
+If there is an HTTP error submitting the form with Form `fetch` then,
+because no direct `catch` is defined in the `onsubmitx` the extended
+Form will `showModal` on the `registration` dialog - because it shares
+the same name as the Form and has a class of `HTTPError`.
+
+In this example there is no `dialog`:
+
+```html
+<form name="registration" method="POST" action="/register"
+      onsubmitx="this.fetch()">
+   <label>forename:</label><input type="text" name="forename">
+   <label>surname:</label> <input type="text" name="surname">
+   <input type="submit" value="register">
+</form>
+```
+
+and so what will happen on error will be a simple `alert`.
+
+
+_fin_

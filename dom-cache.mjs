@@ -30,9 +30,36 @@ const defaultIgnoreFunction = function () {
     return process.cwd();
 };
 
+function pluginIncluder(filename) {
+    return async function (dom, api) {
+        return fs.promises.readFile(filename, "utf8")
+            .then(fileContent => {
+                const script = dom.head.firstElementChild !== null
+                      ? dom.head.insertBefore(
+                          dom.createElement("script"),
+                          dom.head.firstElementChild)
+                      : dom.head.appendChild(dom.createElement("script"));
+                script.textContent = fileContent;
+            });
+    };
+}
+
+const formHandlingIncluder = pluginIncluder(
+    path.join(__dirname, "plugin-script-form-handling.js")
+);
+const templateDataAdder = pluginIncluder(
+    path.join(__dirname, "plugin-script-template-jsdata.js")
+);
+const QquerySelectorAdder = pluginIncluder(
+    path.join(__dirname, "plugin-script-Q-query-selector.js")
+);
+
 // ignoreFile can be a function or a string - if a function it is
 // evaluated with no args
 export default function (directory, {
+    formHandling=false,
+    templateJSData=false,
+    QquerySelector=false,
     modifierFunctions=[],
     ignoreFile=defaultIgnoreFunction,
     errReporting = {
@@ -78,6 +105,13 @@ export default function (directory, {
         } 
     });
 
+    const modifierFns = modifierFunctions.concat(
+        formHandling ? [formHandlingIncluder]  : []
+    ).concat(
+        templateJSData ? [templateDataAdder] : []
+    ).concat(
+        QquerySelector ? [QquerySelectorAdder] : []
+    );
     var apiObject = {
         async updateJsdom(pageName) {
             console.log("updating file template:", pageName);
@@ -109,7 +143,7 @@ export default function (directory, {
                 }
             };
 
-            for (const modifier of modifierFunctions) {
+            for (const modifier of modifierFns) {
                 await modifier(newDom, temporaryApi);
             }
 
