@@ -54,6 +54,15 @@ const QquerySelectorAdder = pluginIncluder(
     path.join(__dirname, "plugin-script-Q-query-selector.js")
 );
 
+function readFileSyncNoError(filename) {
+    try {
+        return fs.readFileSync(filename, "utf8");
+    }
+    catch (e) {
+        return "";
+    }
+}
+
 // ignoreFile can be a function or a string - if a function it is
 // evaluated with no args
 export default function (directory, {
@@ -75,7 +84,7 @@ export default function (directory, {
                   ? (ignoreFile())
                   : ignoreFile;
             // console.log("real ignore file:", realIgnoreFile);
-            return [,fs.readFileSync(realIgnoreFile, "utf8")];
+            return [,readFileSyncNoError(realIgnoreFile)];
         }
         catch (e) { return [e]; }
     })();
