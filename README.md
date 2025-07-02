@@ -75,7 +75,7 @@ This is quite fast.
 
 Everything is in the dom cache creation really:
 
-```
+```js
 function domCache (directory, {
     modifierFunctions=[],
     ignoreFile=defaultIgnoreFunction,
