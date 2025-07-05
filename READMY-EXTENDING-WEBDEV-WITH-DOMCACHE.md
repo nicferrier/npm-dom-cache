@@ -1,5 +1,11 @@
 # Extending WebDev with DomCache
 
+Table of content:
+
+* [`Q` helper](#Qhelper)
+* [`template` helper](#templatehelper)
+* [`form` handling](#formhandling)
+
 DomCache affords the perfect opportunity for backend developers to
 inject javascript into a page, through `modifierFunctions`:
 
