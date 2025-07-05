@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <style>html { color-scheme: light dark; font-family: sans-serif; }</style>
+    <link rel="icon" href="data:;,">
+  </head>
+  <body>
+    <section>
+      <template>
+        <p>A poem by <slot name="author"></slot></p>
+      </template>
+      <p>In my craft and sullen art<br>
+        Exercised in the still night<br>
+        When only the moon rages<br>
+        And lovers lie abed<br>
+        With all their griefs in their arms<br>
+      </p>
+    </section>
+  </body>
+  <script>window.addEventListener("load", _ => {
+    Q('section').insert({author: "Dylan Thomas"}, Q('section p'));
+})
+  </script>
+</html>

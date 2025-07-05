@@ -15,18 +15,20 @@ window.addEventListener("load", loadEvt => {
         return _domParser;
     };
     Array.from(document.forms).forEach(form => {
-        if (form.getAttribute("onsubmitx") === null
-            || form.getAttribute("onsubmitx") === undefined) {
+        if (form.getAttribute("onsubmit") === null
+            || form.getAttribute("onsubmit") === undefined) {
             return;
         }
 
         // Decorate
-        form.fetch = async function({
+        form.go = async function({
+            method=undefined,
             onJSON=undefined,
             onDocument=undefined
         }={}) {
-            console.log("Form EXTEND fetch");
-            const fetchOps = { method: form.getAttribute("method")??"GET" };
+            const formMethod = method??form.getAttribute("method")??"GET";
+            console.log("Form EXTEND go");
+            const fetchOps = { method: formMethod };
             if (fetchOps.method === "POST") {  // FIXME!! what other methods have bodies?
                 const body = ({
                     "application/x-www-form-urlencoded":
@@ -44,7 +46,7 @@ window.addEventListener("load", loadEvt => {
 
             return fetch(form.getAttribute("action")??"", fetchOps).then(r => {
                 if (!(r.status === 200 || r.status === 201)) {
-                    console.log("Form EXTEND fetch error response");
+                    console.log("Form EXTEND go error response");
                     throw new HTTPError(r, r.statusText);
                 }
                 return r;
@@ -76,17 +78,32 @@ window.addEventListener("load", loadEvt => {
                 }
                 return r;
             }).then(r => {
-                console.log("Form.Fetch EXTEND data type handling");
+                console.log("Form.Go EXTEND data type handling");
                 if (r.data && (typeof onJSON === "function")) {
                     return Promise.resolve(onJSON.call(form, r));
                 }
                 if (r.document && (typeof onDocument === "function")) {
-                    return Promise.resolve(onDocument.call(this, r));
+                    return Promise.resolve(onDocument.call(form, r));
                 }
                 // else maybe it's a querySelector?
                 return r;
             });
         };
+        form.post = function({
+            onJSON=undefined,
+            onDocument=undefined
+        }) { return form.go.call(form, {method:"POST", onJSON, onDocument}); };
+        form.POST = form.post;
+        form.delete = function({
+            onJSON=undefined,
+            onDocument=undefined
+        }) { return form.go.call(form, {method:"DELETE", onJSON, onDocument}); };
+        form.DELETE = form.delete;
+        form.put = function({
+            onJSON=undefined,
+            onDocument=undefined
+        }) { return form.go.call(form, {method:"PUT", onJSON, onDocument}); };
+        form.PUT = form.put;
 
         form.err = function (err) {
             console.log("Form EXTEND err handler");
@@ -107,20 +124,23 @@ window.addEventListener("load", loadEvt => {
             throw err;
         };
 
-        form.addEventListener("submit", async submitEvt => {
+        form.onsubmit = function () {
+            const submitEvt = window.event;
             submitEvt.preventDefault();
             submitEvt.stopPropagation();
-            const script = form.getAttribute("onsubmitx");
-            console.log("script:", script);
+            const script = form.getAttribute("onsubmit");
+            console.log("script:", script, form.onsubmit);
             if (script === null || script === undefined) {
                 return false;
             }
             const evaler = function () {
-                return eval(`"use strict"; ${script}`);
+                return eval(`"use strict";
+var {go, POST, PUT, DELETE} = this; 
+${script}`);
             };
             evaler.call(form)?.catch(form.err);
-            
+
             return false;
-        });
+        };
     });
 });

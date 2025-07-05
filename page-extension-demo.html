@@ -44,13 +44,13 @@
     </form>
 
     <form method='POST' action='/identity'
-          onsubmitx='this.fetch().then(r=>alert("form said:" + r.statusText))'>
+          onsubmit='go().then(r=>alert("form said:" + r.statusText))'>
       <legend>submit a form, alert the response status</legend>
       <input type="submit" name="submit" value="submit">
     </form>
 
     <form method="POST" action="err"
-          onsubmitx='this.fetch().catch(e => alert("error! " + e.message))'>
+          onsubmit='go().catch(e => alert("error! " + e.message))'>
       <legend>submit to an error endpoint, handle the error with <code>alert</code></legend>
       <input type="submit" value="submit">
     </form>
@@ -59,14 +59,14 @@
       <button autofocus onclick="this.parentElement.close()">close</button>
       <p>There was an error!</p>
     </dialog>
-    <form name="myform" method="POST" action="err" onsubmitx="this.fetch()">
+    <form name="myform" method="POST" action="err" onsubmit="go()">
       <legend>show default customizable error handling</legend>
       <input type="submit" name="send" value="submit">
     </form>
 
     <div>
       <form method="POST" action="/identity?out=html"
-            onsubmitx="this.fetch({onDocument(r) { this.parentElement.querySelector('article').innerHTML = r.document.body.innerHTML}})">
+            onsubmit="go({onDocument(r) { this.parentElement.querySelector('article').innerHTML = r.document.body.innerHTML}})">
         <legend>show document handling</legend>
         <fieldset>
           <label>field 1</label>
@@ -91,7 +91,7 @@
     </div>
 
     <form method="POST" action="identity"
-          onsubmitx="this.fetch({onJSON(r) { row(r.data, '#rows') }})">
+          onsubmit="go({onJSON(r) { row(r.data, '#rows') }})">
       <legend>show JSON handling into a templated section with script</legend>
       <fieldset>
         <label>field 1</label>
@@ -115,7 +115,7 @@
     </section>
 
     <form method="POST" action="identity"
-          onsubmitx="this.fetch({onJSON: Q('#rowslist').add})">
+          onsubmit="go({onJSON: Q('#rowslist').add})">
       <legend>show JSON handling into a templated section with less script</legend>
       <fieldset>
         <label>field 1</label>
@@ -139,5 +139,31 @@
         </div>
       </template>
     </section>
+
+    <form method="POST" action="identity"
+          onsubmit="go({onJSON: Q('#postrowslist').add})">
+      <legend>show JSON handling with <code>post</code> method</legend>
+      <fieldset>
+        <label>field 1</label>
+        <input type="text" name="field1">
+
+        <label>field 2</label>
+        <input type="text" name="field2">
+
+        <label>field 3</label>
+        <input type="text" name="field3">
+      </fieldset>
+      <input type="submit" value="submit">
+    </form>
+    <section id="postrowslist">
+      <template>
+        <div>
+          <span><slot name="field1"></slot></span>
+          <span><slot name="field2"></slot></span>
+          <span><slot name="field3"></slot></span>
+        </div>
+      </template>
+    </section>
+   
   </body>
 </html>
