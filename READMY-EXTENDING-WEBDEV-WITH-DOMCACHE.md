@@ -162,9 +162,8 @@ Possibly, `replace` is more useful:
 much like in HTMx.
 
 
-<a id="formhandling">
+<a id="formhandling"></a>
 ## Form Handling
-</a>
 
 Doing:
 
