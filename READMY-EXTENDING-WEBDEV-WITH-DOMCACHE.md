@@ -28,7 +28,7 @@ application, perhaps to provide some standard tooling for developers.
 DomCache even comes with some pre-canned extensions and this readme
 seeks to document those extensions.
 
-
+<a id="Qhelper"></a>
 ## The `Q` helper
 
 JQuery used to have the `$` function which was very cool. DOM has an
@@ -58,6 +58,7 @@ And then you can use it inside your page:
   <article></article>
 ```
 
+<a id="templatehelper"></a>
 ## Template helpers
 
 Doing:
