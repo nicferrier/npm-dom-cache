@@ -168,6 +168,31 @@ Possibly, `replace` is more useful:
 `replace` is so useful because it allows Forms to replace content,
 much like in HTMx.
 
+### Attributes
+
+According to the HTML5 specification `slot` elements cannot cause
+attribute nodes to be created.
+
+But I have added a a hack to allow this:
+
+```html
+<section id="hypertext">
+  <template>
+    <p>Go <a>
+     <slot name="url" attr="href"></slot>
+     <slot name="link"></slot>
+    </a> for a good time</p>
+  </template>
+  <p>everything is good</p>
+</section>
+<script>Q('#rows').replace({'link':"to London", "href": "https://discover.london"})</script>
+```
+
+The `attr` attribute on a slot used with this system will caused the
+parent element to receive the named attribute with the value found by
+the slot replacement.
+
+
 
 <a id="formhandling"></a>
 ## Form Handling
@@ -183,10 +208,6 @@ will turn on the Form Handling extension for all pages cached.
 This provides extended Form behaviour when an `onsubmit` attribute is
 added to a `form` object. The extensions allow intercepting submission
 of the Form in the manner of the `submit` form event.
-
-Note that `onsubmit` as an attribute was removed from the HTML
-specifications (it is present in 4 but not in 5) so the reintroduction
-of this attribute to specify JS form handling is deliberate.
 
 Here is an example:
 

@@ -115,11 +115,11 @@ export default function (directory, {
     });
 
     const modifierFns = modifierFunctions.concat(
+        QquerySelector ? [QquerySelectorAdder] : []
+    ).concat(
         formHandling ? [formHandlingIncluder]  : []
     ).concat(
         templateJSData ? [templateDataAdder] : []
-    ).concat(
-        QquerySelector ? [QquerySelectorAdder] : []
     );
     var apiObject = {
         async updateJsdom(pageName) {

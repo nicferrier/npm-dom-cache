@@ -18,26 +18,25 @@ window.addEventListener("load", _ => {
                 return fn.apply(elementObject, arguments);
             }
         }
+        const slotReplace = slot => {
+            if (slot.getAttribute("attr")) {
+                slot.parentElement.setAttribute(slot.getAttribute("attr"), data[slot.name]);
+                slot.remove();
+            } else slot.replaceWith(data[slot.name]);
+        };
         elementObject.add = elementMethod(function (data) {
-            // console.log("add data:", data);
             const fragment = templateObject.content.cloneNode(true);
-            Array.from(fragment.querySelectorAll("slot")).forEach(slot => {
-                slot.replaceWith(data[slot.name]);
-            });
+            Array.from(fragment.querySelectorAll("slot")).forEach(slotReplace);
             return elementObject.appendChild(fragment);
         });
         elementObject.insert = elementMethod(function (data, insertPoint) {
             const fragment = templateObject.content.cloneNode(true);
-            Array.from(fragment.querySelectorAll("slot")).forEach(slot => {
-                slot.replaceWith(data[slot.name]);
-            });
+            Array.from(fragment.querySelectorAll("slot")).forEach(slotReplace);
             return elementObject.insertBefore(fragment, insertPoint);
         });
         elementObject.replace = elementMethod(function (data) {
             const fragment = templateObject.content.cloneNode(true);
-            Array.from(fragment.querySelectorAll("slot")).forEach(slot => {
-                slot.replaceWith(data[slot.name]);
-            });
+            Array.from(fragment.querySelectorAll("slot")).forEach(slotReplace);
             Array.from(elementObject.children)
                 .filter(e => !e.isEqualNode(templateObject))
                 .forEach(e => e.remove());

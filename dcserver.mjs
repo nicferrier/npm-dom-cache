@@ -17,9 +17,9 @@ const thisDirectoryCache = domCache(__dirname, {
 });
 
 const cache = domCache(process.cwd(), {
+    QquerySelector: true,
     formHandling: true,
-    templateJSData: true,
-    QquerySelector: true
+    templateJSData: true
 });
 
 const app = express();

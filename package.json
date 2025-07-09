@@ -1,6 +1,6 @@
 {
     "name": "@nicferrier/dom-cache",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "A mini framework for using dom on the server side.",
     "main": "dom-cache.mjs",
     "bin": {
