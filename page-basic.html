@@ -29,8 +29,29 @@
           grid-template-columns: 20ch 1fr 1fr;
       }
     </style>
+    <script>
+      window.addEventListener(
+          "load", _ => {
+              const m = new MutationObserver(evtArr => {
+                  console.log(evtArr);
+                  evtArr.forEach(evt => {
+                      const script = evt.target.getAttribute("onclasschange");
+                      const evalit = function() {
+                          eval(script);
+                      }
+                      evalit.call(evt.target);
+                  });
+              });
+              m.observe(document.body, {
+                  childList: true,
+                  subtree: true,
+                  attributeFilter: ['class']
+              });
+          })
+    </script>
   </head>
   <body>
+    <button onclick="Q('article p').classList.add('class-change')">Click me</button>
     <form method="POST" action="identity" onsubmit="go({onJSON:Q('section').replace})">
       <fieldset>
         <label>field one:</label><input type="text" name="fieldone">
@@ -41,12 +62,24 @@
     </form>
     <section>
       <template>
-        <ul>
-          <li><slot name="fieldone"></slot></li>
-          <li><slot name="fieldtwo"></slot></li>
-          <li><slot name="fieldthree"></slot></li>
-        </ul>
+        <div class="insert">
+          <dialog onclasschange="console.log(this.name)">
+            <div>
+              field one: <slot name="fieldone"></slot><br>
+              field two: <slot name="fieldtwo"></slot><br>
+              field three: <slot name="fieldthree"></slot>
+            </div>
+          </dialog>
+          <ul>
+            <li><button
+                  onclick="this.closest('.insert')?.querySelector('dialog').showModal()"
+                  >click</button><slot name="fieldone"></slot></li>
+            <li><slot name="fieldtwo"></slot></li>
+            <li><a><slot name="fieldthree" attr="href"></slot></a></li>
+          </ul>
+        </div>
       </template>
+      <p onclasschange="alert(this.classList)">Hey</p>
       <p>This will be replaced with the list</p>
       <P>In my craft and sullen art<br>
         Exercised in the still night</P>
@@ -55,5 +88,51 @@
         With all their griefs in their arms<br>
       </P>
     </section>
+
+    <form method="POST" action="identity" onsubmit="go({onJSON:Q('article').add})">
+      <fieldset>
+        <label>field one:</label><input type="text" name="fieldone">
+        <label>field two:</label><input type="text" name="fieldtwo">
+        <label>field three:</label><input type="text" name="fieldthree">
+        <input type="submit" value="submit">
+      </fieldset>
+    </form>
+    <style>
+      article {
+          div.insert {
+              ul { display: block; }
+              form { display: none; }
+          }
+          div.insert.edit {
+              ul { display: none; }
+              form { display: block; }
+          }
+      }
+    </style>
+    <article>
+      <template>
+        <div class="insert">
+          <button
+            onclick="this.closest('.insert').classList.toggle('edit')"
+            >edit</button>
+          <ul>
+            <li onclasschange="alert('yoo hoo!')"><slot name="fieldone"></slot></li>
+            <li><slot name="fieldtwo"></slot></li>
+            <li><a><slot name="fieldthree" attr="href"></slot><slot name="fieldthree"></slot></a></li>
+            <li><a slot="fieldthree" slot-attr="href">LINK</a></li>
+          </ul>
+          <form name="editform" method="POST" action="identity"
+                onsubmit="go().then(_ => alert('SOMETHING WAS DONE'))">
+            <fieldset>
+              <label>FIELD 1:</label><input type="text" slot="fieldone" slot-attr="value">
+              <label>FIELD 2:</label><input type="text" slot="fieldtwo" slot-attr="value">
+              <label>FIELD 3:</label><input type="text" slot="fieldthree" slot-attr="value">
+              <input type="submit" value="dosomething">
+            </fieldset>
+          </form>
+        </div>
+      </template>
+      <p onclasschange="alert(this.classList)">Hey</p>
+    </article>
   </body>
 </html>
