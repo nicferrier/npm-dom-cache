@@ -49,7 +49,7 @@ window.formExtender = (function () {
                 const formMethod = method??form.getAttribute("method")??"GET";
                 console.log(`Form EXTEND go ${formMethod}`);
                 const fetchOps = { method: formMethod };
-                if (fetchOps.method === "POST") {  // FIXME!! what other methods have bodies?
+                if (["POST", "PUT"].includes(fetchOps.method)) {
                     const body = ({
                         "application/x-www-form-urlencoded":
                         _ => new URLSearchParams(new FormData(form)),
