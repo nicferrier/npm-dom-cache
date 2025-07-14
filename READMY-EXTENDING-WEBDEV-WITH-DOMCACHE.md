@@ -376,7 +376,7 @@ or you could use:
 now an `onsubmit` bound alias for `go` with a `POST` method:
 
 ```html
-<form method="POST" action="/handler" onsubmit="POST()"><form>
+<form action="/handler" onsubmit="POST()"><form>
 ```
 
 note you cannot use `post()` - it _must_ be uppercase.

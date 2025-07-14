@@ -49,7 +49,7 @@ window.formExtender = (function () {
                 const formMethod = method??form.getAttribute("method")??"GET";
                 console.log(`Form EXTEND go ${formMethod}`);
                 const fetchOps = { method: formMethod };
-                if (["POST", "PUT"].includes(fetchOps.method)) {
+                if (["POST", "PUT", "DELETE"].includes(fetchOps.method)) {
                     const body = ({
                         "application/x-www-form-urlencoded":
                         _ => new URLSearchParams(new FormData(form)),
